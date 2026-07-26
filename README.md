@@ -1,5 +1,11 @@
-# uijeong-web
+# uijeong-web — 경기도의회 의정활동 관리
 
-이 저장소의 내용은 2026-07-13 로컬 PC로 이전되었습니다. (의정활동 프로젝트 — 웹 게시 중단)
+제12대 경기도의회 문화체육관광위원회 의원 의정활동 관리 페이지입니다.
 
-저장소 자체를 없애려면: GitHub → Settings → Danger Zone → Delete this repository
+- **index.html** — 목차(랜딩)
+- **jeonyeseul.html** — 전예슬 의원 (오산 제2선거구)
+- **hangyuchan.html** — 한규찬 의원 (평택 제4선거구)
+
+각 페이지 기능: 프로필·공약관리·조례·5분발언·도정질문·기고인터뷰·민원·일정, 보기/편집 모드 전환, 항목별 처리기록·사진·파일 첨부, 엑셀(.xlsx)·한글(.rtf/.hwpx) 저장, JSON 백업.
+
+편집 내용은 각 브라우저(localStorage)에 저장됩니다.
