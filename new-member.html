@@ -119,6 +119,12 @@ footer{font-size:11px;color:#889;padding:16px 24px;text-align:center}
 </div>
 
 <div class="card">
+  <h2>🔒 열람 비밀번호 *</h2>
+  <div class="hint">전예슬·한규찬 의원 페이지와 동일하게, 비밀번호를 아는 사람만 열람할 수 있도록 암호화됩니다. <b>분실 시 복구되지 않으니</b> 꼭 따로 기록해 두세요.</div>
+  <input type="text" id="f_password" placeholder="예: 4자리 숫자">
+</div>
+
+<div class="card">
   <div class="btnbar">
     <button class="btn" onclick="generate()">📥 페이지 생성 · 다운로드</button>
     <span class="err" id="genErr"></span>
@@ -127,6 +133,9 @@ footer{font-size:11px;color:#889;padding:16px 24px;text-align:center}
 
 <div class="card result" id="resultBox">
   <h2>✅ 생성 완료</h2>
+  <div class="hint" style="background:#fff3d6;color:#8a5a00;border-radius:8px;padding:10px 12px;font-size:13px">
+    🔑 설정한 열람 비밀번호: <b id="pwShow" style="font-size:15px;letter-spacing:1px"></b> — 분실 시 복구되지 않으니 의원실에 안전하게 전달·별도 기록해 두세요.
+  </div>
   <div class="steps">
     <b>1.</b> 방금 다운로드된 <code id="fnameShow"></code> 파일을 uijeong-web 저장소 폴더에 추가하세요.<br>
     <b>2.</b> 아래 카드 코드를 <code>index.html</code>의 의원 카드 목록에 붙여넣으세요.<br>
@@ -207,11 +216,23 @@ function onPhoto(inp){
 
 function val(id){return document.getElementById(id).value.trim();}
 
+function b64e(buf){const bytes=buf instanceof ArrayBuffer?new Uint8Array(buf):buf;let bin="";for(let i=0;i<bytes.length;i++)bin+=String.fromCharCode(bytes[i]);return btoa(bin);}
+async function encryptPayload(dataObj,password){
+  const enc=new TextEncoder();
+  const salt=crypto.getRandomValues(new Uint8Array(16));
+  const iv=crypto.getRandomValues(new Uint8Array(12));
+  const km=await crypto.subtle.importKey("raw",enc.encode(password),"PBKDF2",false,["deriveKey"]);
+  const key=await crypto.subtle.deriveKey({name:"PBKDF2",salt,iterations:200000,hash:"SHA-256"},km,{name:"AES-GCM",length:256},false,["encrypt"]);
+  const ct=await crypto.subtle.encrypt({name:"AES-GCM",iv},key,enc.encode(JSON.stringify(dataObj)));
+  return {s:b64e(salt),i:b64e(iv),c:b64e(ct),it:200000};
+}
+
 async function generate(){
   const err=document.getElementById("genErr");err.textContent="";
-  const name=val("f_name"), slug=val("f_slug");
+  const name=val("f_name"), slug=val("f_slug"), pw=val("f_password");
   if(!name){err.textContent="성명을 입력해 주세요.";return;}
   if(!slug){err.textContent="파일명(영문)을 입력해 주세요.";return;}
+  if(!pw){err.textContent="열람 비밀번호를 입력해 주세요.";return;}
 
   const party=val("f_party_etc")||document.getElementById("f_party").value;
   const eduC=edu.filter(r=>r.some(x=>x.trim()));
@@ -242,12 +263,17 @@ async function generate(){
   const headerSub="제12대 경기도의회 · "+val("f_committee")+(val("f_headersub")?(" · "+val("f_headersub")):"");
   const sw=SWATCHES[theme];
 
+  const genBtn=document.querySelector('.btnbar .btn');
+  genBtn.disabled=true;genBtn.textContent="🔒 암호화 중…";
+  const PAYLOAD=await encryptPayload(DEFAULT_DATA,pw);
+  genBtn.disabled=false;genBtn.textContent="📥 페이지 생성 · 다운로드";
+
   const out=tpl
     .replace("__TITLE__",headerTitle)
     .replace("__MAIN__",sw[1]).replace("__ACCENT__",sw[2])
     .replace("__HEADER_TITLE__",headerTitle).replace("__HEADER_SUB__",headerSub)
     .replace("__STORAGE_KEY__","uijeong_"+slug+"_v1")
-    .replace("__DEFAULT_DATA_JSON__",JSON.stringify(DEFAULT_DATA));
+    .replace("__PAYLOAD_JSON__",JSON.stringify(PAYLOAD));
 
   const blob=new Blob([out],{type:"text/html"});
   const a=document.createElement("a");
@@ -255,6 +281,7 @@ async function generate(){
   document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},600);
 
   document.getElementById("fnameShow").textContent=slug+".html";
+  document.getElementById("pwShow").textContent=pw;
   lastSnippet=`<a class="card" href="${slug}.html" style="--c:${sw[1]}">\n  <div class="nm">${esc(name)} 의원</div>\n  <div class="meta">${esc(party)}${val("f_headersub")?" · "+esc(val("f_headersub")):""}${val("f_highlight")?"<br>"+esc(val("f_highlight")):""}</div>\n  <div class="go">의정활동 페이지 열기 →</div>\n</a>`;
   document.getElementById("snippetBox").textContent=lastSnippet;
   document.getElementById("resultBox").classList.add("show");
