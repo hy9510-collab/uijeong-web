@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>새 의원 등록 — 의정활동 관리</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:'맑은 고딕',Malgun Gothic,'Segoe UI',sans-serif;background:#eef1f6;color:#222;font-size:14px;line-height:1.6}
+header{background:#1a3a6c;color:#fff;padding:14px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+header .ttl{font-size:18px;font-weight:800}
+header .sub{font-size:12px;opacity:.85}
+header a{color:#cdd9f2;font-size:12px;text-decoration:none;margin-left:auto}
+main{max-width:900px;margin:0 auto;padding:20px}
+.card{background:#fff;border:1px solid #d8e0ec;border-radius:12px;padding:18px 20px;margin-bottom:16px}
+.card h2{margin:0 0 4px;font-size:15px;color:#1a3a6c}
+.card .hint{color:#889;font-size:12px;margin-bottom:12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px 14px}
+.field{margin-bottom:10px}
+.field label{display:block;font-size:12px;color:#556;margin-bottom:3px;font-weight:700}
+.field .ex{font-weight:400;color:#99a;margin-left:4px}
+input[type=text],input[type=email],textarea,select{width:100%;padding:7px 9px;border:1px solid #d8e0ec;border-radius:6px;font:inherit;background:#fff}
+textarea{resize:vertical;min-height:52px;white-space:pre-wrap}
+.wide{grid-column:1/-1}
+.rowbox{display:flex;gap:6px;margin-bottom:6px;align-items:center}
+.rowbox input{flex:1}
+.rowdel{background:#fde3e3;color:#a12626;border:none;border-radius:5px;padding:6px 10px;cursor:pointer;font-size:12px}
+.addrow{background:#eef2fa;color:#1a3a6c;border:1px dashed #b7c3de;border-radius:6px;padding:6px 12px;cursor:pointer;font-size:12px;font-weight:700}
+.photobox{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.photobox img{width:110px;height:140px;object-fit:cover;border-radius:8px;border:1px solid #d8e0ec;background:#f4f6fa}
+.swatches{display:flex;gap:8px;flex-wrap:wrap}
+.swatch{width:64px;height:40px;border-radius:8px;border:2px solid transparent;cursor:pointer;display:flex;overflow:hidden}
+.swatch i{flex:1}
+.swatch.on{border-color:#1a3a6c;box-shadow:0 0 0 2px #b7c3de}
+.btnbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.btn{background:#1a3a6c;color:#fff;border:none;border-radius:7px;padding:11px 20px;font-size:14px;font-weight:700;cursor:pointer}
+.btn.ghost{background:#eef2fa;color:#1a3a6c}
+.err{color:#a12626;font-size:12.5px;margin-top:6px;min-height:16px}
+.result{display:none}
+.result.show{display:block}
+.snippet{background:#0b1c3d;color:#cdd9f2;border-radius:8px;padding:14px;font-family:Consolas,monospace;font-size:12px;white-space:pre-wrap;word-break:break-all;max-height:220px;overflow:auto}
+.steps{font-size:13px;line-height:1.9}
+.steps b{color:#1a3a6c}
+footer{font-size:11px;color:#889;padding:16px 24px;text-align:center}
+</style></head>
+<body>
+<header>
+  <div><div class="ttl">➕ 새 의원 등록</div><div class="sub">기초자료를 입력하면 전예슬·한규찬 의원과 같은 수준의 의정활동 페이지를 생성합니다</div></div>
+  <a href="index.html">← 의원 선택으로</a>
+</header>
+<main>
+
+<div class="card">
+  <h2>👤 기본정보</h2>
+  <div class="hint">화면 상단과 브라우저 탭 제목에 쓰입니다.</div>
+  <div class="grid2">
+    <div class="field"><label>성명 *</label><input type="text" id="f_name" placeholder="예: 홍길동"></div>
+    <div class="field"><label>한자</label><input type="text" id="f_hanja" placeholder="예: 洪吉東"></div>
+    <div class="field"><label>소속 정당</label>
+      <select id="f_party" onchange="document.getElementById('f_party_etc').style.display=this.value==='기타'?'block':'none'">
+        <option>더불어민주당</option><option>국민의힘</option><option>조국혁신당</option><option>개혁신당</option><option>진보당</option><option>무소속</option><option>기타</option>
+      </select>
+      <input type="text" id="f_party_etc" placeholder="정당명 직접 입력" style="display:none;margin-top:6px">
+    </div>
+    <div class="field"><label>현 직위</label><input type="text" id="f_position" value="제12대 경기도의회 의원"></div>
+    <div class="field"><label>위원회</label><input type="text" id="f_committee" value="문화체육관광위원회"></div>
+    <div class="field wide"><label>선거구 · 관할 동</label><textarea id="f_district" placeholder="예: 경기도 ○○시 제○선거구&#10;○○1동 · ○○2동">경기도 </textarea></div>
+    <div class="field wide"><label>임기</label><textarea id="f_term">상임위(전반기)  2026. 7. 1. ~ 2028. 6. 30.
+전체 임기      2026. 7. 1. ~ 2030. 6. 30.</textarea></div>
+    <div class="field wide"><label>슬로건</label><input type="text" id="f_slogan" placeholder="예: ○○의 검증된 일꾼!"></div>
+    <div class="field wide"><label>헤더 요약<span class="ex">예: 오산2 (제2선거구) · 화면 상단에 짧게 표시</span></label><input type="text" id="f_headersub" placeholder="예: ○○2 (제○선거구)"></div>
+    <div class="field wide"><label>의원 선택 화면 카드 문구<span class="ex">예: 제12대 신임 / 前 ○○시의원 · 의원 선택 카드 둘째 줄</span></label><input type="text" id="f_highlight" placeholder="예: 제12대 신임"></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>🖼 프로필 사진</h2>
+  <div class="hint">업로드하면 자동으로 크기를 줄여 저장합니다 (다른 의원 페이지와 동일 방식).</div>
+  <div class="photobox">
+    <img id="photoPrev" alt="">
+    <div>
+      <input type="file" accept="image/*" onchange="onPhoto(this)">
+      <div class="hint" id="photoStat" style="margin:6px 0 0"></div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>🎓 학력</h2>
+  <div id="eduRows"></div>
+  <button class="addrow" onclick="addRow('edu')">+ 행 추가</button>
+</div>
+
+<div class="card">
+  <h2>💼 주요 경력</h2>
+  <div id="careerRows"></div>
+  <button class="addrow" onclick="addRow('career')">+ 행 추가</button>
+</div>
+
+<div class="card">
+  <h2>☎ 연락처</h2>
+  <div class="grid3">
+    <div class="field"><label>사무소</label><input type="text" id="f_office" placeholder="예: 경기도 ○○시 ○○로 00, 2층"></div>
+    <div class="field"><label>전화</label><input type="text" id="f_tel" placeholder="예: 의원실 031-000-0000"></div>
+    <div class="field"><label>이메일</label><input type="text" id="f_email" placeholder="예: name@naver.com"></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>🎨 테마 색상</h2>
+  <div class="hint">의원별로 화면 색상을 구분합니다.</div>
+  <div class="swatches" id="swatches"></div>
+</div>
+
+<div class="card">
+  <h2>📄 파일명 (영문)</h2>
+  <div class="hint">생성될 페이지 주소가 됩니다: uijeong-web.vercel.app/<b id="slugPreview">파일명</b>.html — 영문 소문자·숫자·하이픈만</div>
+  <input type="text" id="f_slug" placeholder="예: honggildong" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9-]/g,'');document.getElementById('slugPreview').textContent=this.value||'파일명'">
+</div>
+
+<div class="card">
+  <div class="btnbar">
+    <button class="btn" onclick="generate()">📥 페이지 생성 · 다운로드</button>
+    <span class="err" id="genErr"></span>
+  </div>
+</div>
+
+<div class="card result" id="resultBox">
+  <h2>✅ 생성 완료</h2>
+  <div class="steps">
+    <b>1.</b> 방금 다운로드된 <code id="fnameShow"></code> 파일을 uijeong-web 저장소 폴더에 추가하세요.<br>
+    <b>2.</b> 아래 카드 코드를 <code>index.html</code>의 의원 카드 목록에 붙여넣으세요.<br>
+    <b>3.</b> 커밋 · 푸시하면 실제 사이트에 반영됩니다. (Claude Code에게 파일과 함께 전달해도 됩니다)
+  </div>
+  <div class="snippet" id="snippetBox"></div>
+  <div class="btnbar" style="margin-top:10px">
+    <button class="btn ghost" onclick="copySnippet()">📋 카드 코드 복사</button>
+    <span class="err" id="copyMsg" style="color:#1a7a2e"></span>
+  </div>
+</div>
+
+</main>
+<footer>이 페이지는 전예슬 · 한규찬 의원 페이지와 동일한 템플릿(_template.html)으로 새 페이지를 생성합니다. 공약 · 의회활동 등 세부 기록은 생성된 페이지의 편집 모드에서 입력합니다.</footer>
+
+<script>
+const SWATCHES=[
+  ["네이비","#1a3a6c","#2f5496"],["그린","#1a5c2a","#2e8b4f"],["버건디","#7a1f2b","#b34756"],
+  ["퍼플","#4a2f7a","#7456b3"],["틸","#14676b","#2f9aa0"],["브라운","#6b4423","#9c6b3f"]
+];
+let theme=0;
+let edu=[["","",""]], career=[["","",""]];
+let lastSnippet="";
+
+function esc(s){return(s==null?"":String(s)).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+function renderSwatches(){
+  document.getElementById("swatches").innerHTML=SWATCHES.map((s,i)=>
+    `<div class="swatch${i===theme?' on':''}" title="${s[0]}" onclick="theme=${i};renderSwatches()"><i style="background:${s[1]}"></i><i style="background:${s[2]}"></i></div>`
+  ).join("");
+}
+function rowsHTML(name,arr,heads){
+  return arr.map((r,i)=>`<div class="rowbox">`+
+    heads.map((h,j)=>`<input placeholder="${h}" value="${esc(r[j]).replace(/"/g,'&quot;')}" onchange="${name}[${i}][${j}]=this.value">`).join("")+
+    `<button class="rowdel" onclick="delRow('${name}',${i})">✕</button></div>`).join("");
+}
+function renderRows(){
+  document.getElementById("eduRows").innerHTML=rowsHTML("edu",edu,["학교","전공","학위"]);
+  document.getElementById("careerRows").innerHTML=rowsHTML("career",career,["기간","직위","기관"]);
+}
+function addRow(k){(k==="edu"?edu:career).push(["","",""]);renderRows();}
+function delRow(k,i){const a=k==="edu"?edu:career;a.splice(i,1);if(!a.length)a.push(["","",""]);renderRows();}
+renderSwatches();renderRows();
+
+let photoData="";
+function compressImage(file,maxSide,q){
+  return new Promise(function(res){
+    const fr=new FileReader();
+    fr.onload=function(e){
+      const img=new Image();
+      img.onload=function(){
+        const w=img.naturalWidth||img.width,h=img.naturalHeight||img.height;
+        const s=Math.min(1,maxSide/Math.max(w,h));
+        const nw=Math.max(1,Math.round(w*s)),nh=Math.max(1,Math.round(h*s));
+        try{
+          const cv=document.createElement("canvas");cv.width=nw;cv.height=nh;
+          const cx=cv.getContext("2d");cx.fillStyle="#fff";cx.fillRect(0,0,nw,nh);
+          cx.drawImage(img,0,0,nw,nh);
+          const out=cv.toDataURL("image/jpeg",q||0.82);
+          res(out.length<e.target.result.length?out:e.target.result);
+        }catch(err){res(e.target.result);}
+      };
+      img.onerror=function(){res(e.target.result);};
+      img.src=e.target.result;
+    };
+    fr.readAsDataURL(file);
+  });
+}
+function fmtSz(n){return n>=1048576?(n/1048576).toFixed(1)+"MB":Math.max(1,Math.round(n/1024))+"KB";}
+function onPhoto(inp){
+  const f=inp.files[0];if(!f)return;
+  compressImage(f,520,0.82).then(url=>{
+    photoData=url;
+    document.getElementById("photoPrev").src=url;
+    document.getElementById("photoStat").textContent="최적화됨: "+fmtSz(f.size)+" → 약 "+fmtSz(Math.round((url.length-url.indexOf(",")-1)*0.75));
+  });
+}
+
+function val(id){return document.getElementById(id).value.trim();}
+
+async function generate(){
+  const err=document.getElementById("genErr");err.textContent="";
+  const name=val("f_name"), slug=val("f_slug");
+  if(!name){err.textContent="성명을 입력해 주세요.";return;}
+  if(!slug){err.textContent="파일명(영문)을 입력해 주세요.";return;}
+
+  const party=val("f_party_etc")||document.getElementById("f_party").value;
+  const eduC=edu.filter(r=>r.some(x=>x.trim()));
+  const careerC=career.filter(r=>r.some(x=>x.trim()));
+
+  const DEFAULT_DATA={
+    profileVersion:1,
+    profile:{
+      name, hanja:val("f_hanja"), party, position:val("f_position"),
+      district:val("f_district"), committee:val("f_committee"), term:val("f_term"),
+      slogan:val("f_slogan"), photo:photoData,
+      edu:eduC.length?eduC:[["","",""]], career:careerC.length?careerC:[["","",""]],
+      contact:{office:val("f_office"),tel:val("f_tel"),email:val("f_email")}
+    },
+    pledges:[], priorities:[], do_ordinances:[], do_speech5:[], do_meeting:[],
+    do_questions:[], do_media:[], minwon:[], schedule:[],
+    direction:"※ 위 우선순위표는 의원 기초자료를 바탕으로 정책지원관이 제안한 초안입니다. 의원과 협의하며 조정하세요. (자유 메모)"
+  };
+
+  let tpl;
+  try{
+    const r=await fetch("_template.html");
+    if(!r.ok)throw 0;
+    tpl=await r.text();
+  }catch(e){err.textContent="_template.html을 불러오지 못했습니다. 같은 폴더에 있는지 확인하세요.";return;}
+
+  const headerTitle=name+" 의원 의정활동 관리";
+  const headerSub="제12대 경기도의회 · "+val("f_committee")+(val("f_headersub")?(" · "+val("f_headersub")):"");
+  const sw=SWATCHES[theme];
+
+  const out=tpl
+    .replace("__TITLE__",headerTitle)
+    .replace("__MAIN__",sw[1]).replace("__ACCENT__",sw[2])
+    .replace("__HEADER_TITLE__",headerTitle).replace("__HEADER_SUB__",headerSub)
+    .replace("__STORAGE_KEY__","uijeong_"+slug+"_v1")
+    .replace("__DEFAULT_DATA_JSON__",JSON.stringify(DEFAULT_DATA));
+
+  const blob=new Blob([out],{type:"text/html"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);a.download=slug+".html";
+  document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},600);
+
+  document.getElementById("fnameShow").textContent=slug+".html";
+  lastSnippet=`<a class="card" href="${slug}.html" style="--c:${sw[1]}">\n  <div class="nm">${esc(name)} 의원</div>\n  <div class="meta">${esc(party)}${val("f_headersub")?" · "+esc(val("f_headersub")):""}${val("f_highlight")?"<br>"+esc(val("f_highlight")):""}</div>\n  <div class="go">의정활동 페이지 열기 →</div>\n</a>`;
+  document.getElementById("snippetBox").textContent=lastSnippet;
+  document.getElementById("resultBox").classList.add("show");
+  document.getElementById("resultBox").scrollIntoView({behavior:"smooth"});
+}
+function copySnippet(){
+  navigator.clipboard.writeText(lastSnippet).then(()=>{
+    const m=document.getElementById("copyMsg");m.textContent="복사되었습니다 ✓";setTimeout(()=>m.textContent="",2000);
+  });
+}
+</script>
+</body></html>
