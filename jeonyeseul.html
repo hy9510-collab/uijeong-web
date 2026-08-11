@@ -843,7 +843,7 @@ async function aiSummarizeAudio(){
       for(var k=0;k<fs.length;k++){var f=fs[k];
         try{var r=await prepAudioForAI(f,setb,title);var bi;for(bi=0;bi<r.big.length;bi++)bigAudio.push(r.big[bi]);for(bi=0;bi<r.inline.length;bi++)files.push(r.inline[bi]);}
         catch(e){skipped.push((f.name||"파일")+" ["+((e&&e.message)||e)+"]");}}
-      var g=aiGatherParts(it,d),allFiles=g.files.concat(files);
+      var allFiles=files;
       if(!bigAudio.length&&!allFiles.length){audioNote("⚠ 정리할 녹음을 넣지 못했어요."+(skipped.length?("<br><span style='font-weight:400'>제외: "+esc(skipped.join(", "))+"</span>"):"")+"<br><span style='font-weight:400'>변환이 안 되면 mp3로 바꿔 다시 넣어보세요. (눌러서 닫기)</span>","#b0392f");setb("🎙 녹음으로 정리");return;}
       setb("🤖 정리 중…");
       audioNote("🤖 <b>"+esc(title)+"</b> 녹음 정리 중… 끝나면 <u>자동 저장</u>돼요. 다른 작업 하셔도 됩니다.<br><span style='font-weight:400'>※ 이 페이지를 <b>새로고침(F5)하지 마세요</b> — 처리가 끊깁니다.</span>","#c4574f");
@@ -856,7 +856,7 @@ async function aiSummarizeAudio(){
       var summary=pick(/={2,}\s*요약\s*={2,}([\s\S]*?)(?:={2,}\s*녹취록\s*={2,}|$)/);
       var transcript=pick(/={2,}\s*녹취록\s*={2,}([\s\S]*)$/);
       /* 녹음을 넣었는데 AI가 '음성없음' → 형식 문제로 못 들은 것. 가짜 내용 저장하지 않고 중단 */
-      if(bigAudio.length&&/음성없음/.test(voice.replace(/\s+/g,""))){
+      if((bigAudio.length||files.length)&&/음성없음/.test(voice.replace(/\s+/g,""))){
         audioNote("⚠ AI가 <b>녹음을 듣지 못했습니다</b>(m4a 형식 문제로 추정) — 가짜 내용이 저장되지 않도록 <b>중단</b>했어요.<br><span style='font-weight:400'>녹음을 <b>mp3</b>로 바꿔 다시 넣어보세요(변환 방법 안내 가능). (눌러서 닫기)</span>","#b0392f");
         setb("🎙 녹음으로 정리");return;
       }
