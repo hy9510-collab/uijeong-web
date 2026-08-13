@@ -289,7 +289,7 @@ const PRI_COLS=[{key:"순위",label:"순위",w:44},{key:"소관",label:"소관",
 const PRI_TPL={"순위":"","소관":"문체위","분야":"","핵심과제":"","필요활동":"","상태":"구상","메모":""};
 const PLEDGE_COLS=[{key:"공약",label:"공약"},{key:"시장",label:"시장",type:"badge"},{key:"국회",label:"국회",type:"badge"},{key:"유형",label:"겹침유형",type:"tp"},{key:"상태",label:"추진상태",type:"status",opts:["미착수","자료수집","추진중","완료","보류"]},{key:"관련조례",label:"관련 경기도 조례"},{key:"소관",label:"소관 상임위"},{key:"메모",label:"메모"}];
 const PLEDGE_TPL={"공약":"","시장":"","국회":"","유형":"미검토","상태":"미착수","관련조례":"","소관":"","메모":""};
-const ORD_COLS=[{key:"의안번호",label:"의안번호"},{key:"의안명",label:"의안명"},{key:"유형",label:"유형"},{key:"발의일",label:"발의일",type:"date"},{key:"처리결과",label:"처리결과"},{key:"원문",label:"의안",type:"link",linkText:"📄 의안"}];
+const ORD_COLS=[{key:"의안번호",label:"의안번호"},{key:"의안명",label:"의안명"},{key:"유형",label:"유형"},{key:"발의일",label:"발의일",type:"date"},{key:"처리결과",label:"처리결과"},{key:"원문",label:"의안",type:"link",linkText:"📄 의안"},{key:"__law",label:"법령정보",type:"lawlink",w:92}];
 const ORD_TPL={"의안번호":"","의안명":"","유형":"","발의일":"","처리결과":"","원문":""};
 const SP_COLS=[{key:"회기",label:"회기"},{key:"차수",label:"차수"},{key:"일자",label:"일자",type:"date"},{key:"주제",label:"주제 / 안건",type:"ta"},{key:"링크",label:"회의록",type:"link",linkText:"🎬 영상"}];
 const SP_TPL={"회기":"","차수":"","일자":"","주제":"","링크":""};
@@ -352,6 +352,8 @@ function linksCell(sec,i,arr,ed){
 function addPLink(sec,i){var a=state[sec][i];if(!Array.isArray(a.보도자료))a.보도자료=[];a.보도자료.push("");render();}
 function updPLink(sec,i,li,v){if(!Array.isArray(state[sec][i].보도자료))state[sec][i].보도자료=[];state[sec][i].보도자료[li]=v;}
 function delPLink(sec,i,li){state[sec][i].보도자료.splice(li,1);render();}
+/* 의안명 → 국가법령정보센터 자치법규 링크(조례만). 결의안 등은 링크 없음 */
+function lawgoLink(nm){nm=String(nm||"").trim().replace(/에\s*대한\s*수정안$/,"").trim();if(!/조례안$/.test(nm))return "";nm=nm.replace(/\s*(일부개정|전부개정|폐지)조례안$/,"").replace(/조례안$/,"조례").trim();return nm?("https://www.law.go.kr/자치법규/"+encodeURIComponent(nm)):"";}
 /* 활동 경과: 같은 민원건에 날짜별 활동을 이어서 기록 */
 function ensureAct(sec,i){var r=state[sec][i];if(!Array.isArray(r.경과))r.경과=[];return r.경과;}
 function actCell(sec,i,arr,ed){
@@ -459,6 +461,7 @@ function tableSec(sec,cols,tpl,opts){
       if(c.type==="attendees")return attCell(sec,i,v,ed);
       if(c.type==="activities")return actCell(sec,i,v,ed);
       if(c.type==="links")return linksCell(sec,i,v,ed);
+      if(c.type==="lawlink"){var _ll=lawgoLink(row["의안명"]);return `<td>${_ll?`<a class="link" href="${_ll}" target="_blank" title="국가법령정보센터 자치법규에서 열기">📘 법령센터</a>`:'<span class="muted">-</span>'}</td>`;}
       if(!ed){
         if(c.type==="ta")return `<td style="white-space:pre-line">${koBreak(esc(v))}</td>`;
         if(c.type==="badge")return `<td>${badge(v)}</td>`;
