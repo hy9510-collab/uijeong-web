@@ -222,7 +222,7 @@ function load(){try{const s=localStorage.getItem(KEY);var d=s?JSON.parse(s):JSON
 function migrate(d){try{
 if(!d||typeof d!=="object")return JSON.parse(JSON.stringify(DEFAULT_DATA));
 if(d.profileVersion!==DEFAULT_DATA.profileVersion){d.profile=JSON.parse(JSON.stringify(DEFAULT_DATA.profile));d.profileVersion=DEFAULT_DATA.profileVersion;}
-if(d.dataVersion!==DEFAULT_DATA.dataVersion){/* 큐레이션 참고자료(기고인터뷰) 최신화. 회의발언(do_meeting)은 사용자 자동채움 보존을 위해 리셋 제외 */["do_media"].forEach(function(k){if(DEFAULT_DATA[k])d[k]=JSON.parse(JSON.stringify(DEFAULT_DATA[k]));});
+if(d.dataVersion!==DEFAULT_DATA.dataVersion){/* 큐레이션 참고자료(기고인터뷰) 최신화. 회의발언(do_meeting)은 사용자 자동채움 보존을 위해 리셋 제외 */if(Array.isArray(DEFAULT_DATA.do_media)){if(!Array.isArray(d.do_media))d.do_media=[];DEFAULT_DATA.do_media.forEach(function(m){if(m&&!d.do_media.some(function(x){return x&&x.제목===m.제목;}))d.do_media.push(m);});}
 if(Array.isArray(d.priorities))d.priorities.forEach(function(p){if(p&&!p.소관)p.소관=/체육|문화|관광|예술|독서|문화재|도서관|콘텐츠/.test(p.분야||"")?"문체위":"타상임위";});
 d.dataVersion=DEFAULT_DATA.dataVersion;}
 for(const k in DEFAULT_DATA){if(!(k in d))d[k]=JSON.parse(JSON.stringify(DEFAULT_DATA[k]));}if(d.pledges)d.pledges=d.pledges.filter(p=>!(p.공약&&(p.공약.indexOf("군장병")>=0||p.공약.indexOf("전역하는")>=0)));
